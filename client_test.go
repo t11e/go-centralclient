@@ -7,17 +7,25 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/t11e/go-pebbleclient"
 )
 
-func TestNew_valid(t *testing.T) {
-	client, err := New(ClientOptions{Host: "localhost"})
-	assert.NoError(t, err)
-	assert.NotNil(t, client)
+func newTestClient(host string) (*Client, error) {
+	pebClient, err := pebbleclient.New(pebbleclient.ClientOptions{
+		Host:    host,
+		AppName: "central",
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return New(pebClient)
 }
 
-func TestNew_invalidHost(t *testing.T) {
-	_, err := New(ClientOptions{Host: ""})
-	assert.Error(t, err)
+func TestNew_valid(t *testing.T) {
+	client, err := newTestClient("localhost")
+	assert.NoError(t, err)
+	assert.NotNil(t, client)
 }
 
 func TestClient_GetApplicationByKey_found(t *testing.T) {
@@ -32,7 +40,7 @@ func TestClient_GetApplicationByKey_found(t *testing.T) {
 		encoder.Encode(org)
 	}))
 
-	client, err := New(ClientOptions{Host: hostFromUrl(server.URL)})
+	client, err := newTestClient(hostFromUrl(server.URL))
 	assert.NoError(t, err)
 
 	resultApp, err := client.GetApplicationByKey("frobnitz")
@@ -45,7 +53,7 @@ func TestClient_GetApplicationByKey_notFound(t *testing.T) {
 		w.WriteHeader(404)
 	}))
 
-	client, err := New(ClientOptions{Host: hostFromUrl(server.URL)})
+	client, err := newTestClient(hostFromUrl(server.URL))
 	assert.NoError(t, err)
 
 	org, err := client.GetApplicationByKey("frobnitz")
@@ -66,7 +74,7 @@ func TestClient_GetOrganization_found(t *testing.T) {
 		encoder.Encode(org)
 	}))
 
-	client, err := New(ClientOptions{Host: hostFromUrl(server.URL)})
+	client, err := newTestClient(hostFromUrl(server.URL))
 	assert.NoError(t, err)
 
 	resultOrg, err := client.GetOrganization("1")
@@ -79,7 +87,7 @@ func TestClient_GetOrganization_notFound(t *testing.T) {
 		w.WriteHeader(404)
 	}))
 
-	client, err := New(ClientOptions{Host: hostFromUrl(server.URL)})
+	client, err := newTestClient(hostFromUrl(server.URL))
 	assert.NoError(t, err)
 
 	org, err := client.GetOrganization("1")
@@ -107,7 +115,7 @@ func TestClient_GetOrganizations(t *testing.T) {
 		encoder.Encode(orgs)
 	}))
 
-	client, err := New(ClientOptions{Host: hostFromUrl(server.URL)})
+	client, err := newTestClient(hostFromUrl(server.URL))
 	assert.NoError(t, err)
 
 	resultOrgs, err := client.GetOrganizations()
