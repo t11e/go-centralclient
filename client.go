@@ -2,6 +2,7 @@ package centralclient
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/t11e/go-pebbleclient"
 )
@@ -12,6 +13,18 @@ type Client struct {
 
 // New constructs a new client.
 func New(client *pebbleclient.Client) (*Client, error) {
+	return &Client{client}, nil
+}
+
+// NewFromRequest constructs a new client from an HTTP request.
+func NewFromRequest(options pebbleclient.ClientOptions, req *http.Request) (*Client, error) {
+	if options.AppName == "" {
+		options.AppName = "central"
+	}
+	client, err := pebbleclient.NewFromRequest(options, req)
+	if err != nil {
+		return nil, err
+	}
 	return &Client{client}, nil
 }
 
