@@ -30,7 +30,7 @@ func TestNew_valid(t *testing.T) {
 
 func TestClient_GetApplicationByKey_found(t *testing.T) {
 	org := &Application{
-		Id:   "1",
+		Id:   1,
 		Name: "The Illuminati & Co.",
 	}
 
@@ -63,7 +63,7 @@ func TestClient_GetApplicationByKey_notFound(t *testing.T) {
 
 func TestClient_GetOrganization_found(t *testing.T) {
 	org := &Organization{
-		Id:    "1",
+		Id:    1,
 		Title: "The Illuminati",
 		Realm: "illuminati",
 	}
@@ -77,7 +77,7 @@ func TestClient_GetOrganization_found(t *testing.T) {
 	client, err := newTestClient(hostFromUrl(server.URL))
 	assert.NoError(t, err)
 
-	resultOrg, err := client.GetOrganization("1")
+	resultOrg, err := client.GetOrganization(1)
 	assert.NoError(t, err)
 	assert.Equal(t, org, resultOrg)
 }
@@ -90,7 +90,7 @@ func TestClient_GetOrganization_notFound(t *testing.T) {
 	client, err := newTestClient(hostFromUrl(server.URL))
 	assert.NoError(t, err)
 
-	org, err := client.GetOrganization("1")
+	org, err := client.GetOrganization(1)
 	assert.NoError(t, err)
 	assert.Nil(t, org)
 }
@@ -98,12 +98,12 @@ func TestClient_GetOrganization_notFound(t *testing.T) {
 func TestClient_GetOrganizations(t *testing.T) {
 	orgs := []*Organization{
 		&Organization{
-			Id:    "1",
+			Id:    1,
 			Title: "The Illuminati",
 			Realm: "illuminati",
 		},
 		&Organization{
-			Id:    "2",
+			Id:    2,
 			Title: "NSA",
 			Realm: "nsa",
 		},

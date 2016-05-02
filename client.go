@@ -57,9 +57,9 @@ func (client *Client) GetOrganizations() ([]*Organization, error) {
 }
 
 // GetOrganization returns an organization by its ID.
-func (client *Client) GetOrganization(id string) (*Organization, error) {
+func (client *Client) GetOrganization(id int) (*Organization, error) {
 	var organization Organization
-	if err := client.client.Get(fmt.Sprintf("/organizations/%s", id), &organization); err != nil {
+	if err := client.client.Get(fmt.Sprintf("/organizations/%d", id), &organization); err != nil {
 		if err == pebbleclient.NotFound {
 			return nil, nil
 		}
@@ -72,7 +72,7 @@ func (client *Client) GetOrganization(id string) (*Organization, error) {
 func (client *Client) GetChildOrganizations(organization *Organization) ([]*Organization, error) {
 	var organizations []*Organization
 	if err := client.client.Get(
-		fmt.Sprintf("/organizations/%s/organizations", organization.Id), &organizations); err != nil {
+		fmt.Sprintf("/organizations/%d/organizations", organization.Id), &organizations); err != nil {
 		return nil, err
 	}
 	return organizations, nil
