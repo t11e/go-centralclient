@@ -6,6 +6,7 @@ type Organization struct {
 	Id        int        `json:"id"`
 	Title     string     `json:"title"`
 	ParentId  int        `json:"parent_id"`
+	Path      string     `json:"path"`
 	Realm     string     `json:"realm"`
 	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
