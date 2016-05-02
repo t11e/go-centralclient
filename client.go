@@ -67,3 +67,13 @@ func (client *Client) GetOrganization(id string) (*Organization, error) {
 	}
 	return &organization, nil
 }
+
+// GetChildOrganizations returns all child organizations of another organization.
+func (client *Client) GetChildOrganizations(organization *Organization) ([]*Organization, error) {
+	var organizations []*Organization
+	if err := client.client.Get(
+		fmt.Sprintf("/organizations/%s/organizations", organization.Id), &organizations); err != nil {
+		return nil, err
+	}
+	return organizations, nil
+}
