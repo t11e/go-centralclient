@@ -1,10 +1,10 @@
 hash: c391b188bae5754d680b1c1569025b7999f23287fba053bf0b498c7f38bc57e2
-updated: 2016-05-02T15:40:44.334332394-04:00
+updated: 2016-05-02T16:35:41.871927315-04:00
 imports:
 - name: github.com/pkg/errors
   version: f85d45fecf0c92c382e731cb03f481957e2ccdd1
 - name: github.com/stretchr/testify
   version: f390dcf405f7b83c997eac1b06768bb9f44dec18
 - name: github.com/t11e/go-pebbleclient
-  version: cc47af9683fec87792be4b53f3662e4bbca7bcd1
+  version: ce1607bce589b4c941de6a2207465cdc1fa08422
 devImports: []
