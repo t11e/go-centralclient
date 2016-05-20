@@ -29,7 +29,10 @@ type Client struct {
 
 // New constructs a new client.
 func New(client pc.Client) (*Client, error) {
-	return &Client{client}, nil
+	return &Client{client.Options(pc.Options{
+		ServiceName: "central",
+		ApiVersion:  1,
+	})}, nil
 }
 
 // IsValidApplicationKey is a convenience method to check if a key is a valid
