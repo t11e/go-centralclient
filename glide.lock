@@ -1,10 +1,17 @@
-hash: c391b188bae5754d680b1c1569025b7999f23287fba053bf0b498c7f38bc57e2
-updated: 2016-05-02T16:35:41.871927315-04:00
+hash: 4e9672b36e464659069e80f3189138bde8e9565a7988a7479cc60295bab36542
+updated: 2016-05-20T13:15:34.949283268-04:00
 imports:
+- name: github.com/ernesto-jimenez/httplogger
+  version: 86cc44f6150a7e9dca8586e425a9c73e71f8ae7d
 - name: github.com/pkg/errors
   version: f85d45fecf0c92c382e731cb03f481957e2ccdd1
 - name: github.com/stretchr/testify
   version: f390dcf405f7b83c997eac1b06768bb9f44dec18
 - name: github.com/t11e/go-pebbleclient
-  version: ce1607bce589b4c941de6a2207465cdc1fa08422
+  version: f28c1858bf5a4b0c4a23c33b09a97dc6cc6683bb
+- name: golang.org/x/net
+  version: 8a52c78636f6b7be1b1e5cb58b01a85f1e082659
+  subpackages:
+  - context
+  - context/ctxhttp
 devImports: []

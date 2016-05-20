@@ -7,19 +7,18 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/t11e/go-pebbleclient"
+	pc "github.com/t11e/go-pebbleclient"
 )
 
 func newTestClient(host string) (*Client, error) {
-	pebClient, err := pebbleclient.New(pebbleclient.ClientOptions{
-		Host:    host,
-		AppName: "central",
+	c, err := pc.NewHTTPClient(pc.Options{
+		Host:        host,
+		ServiceName: "central",
 	})
 	if err != nil {
 		return nil, err
 	}
-
-	return New(pebClient)
+	return New(c)
 }
 
 func TestNew_valid(t *testing.T) {
@@ -36,6 +35,7 @@ func TestClient_GetApplicationByKey_found(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		assert.Equal(t, "/api/central/v1/applications/keys/frobnitz", req.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
 		encoder := json.NewEncoder(w)
 		encoder.Encode(org)
 	}))
@@ -70,6 +70,7 @@ func TestClient_GetOrganization_found(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		assert.Equal(t, "/api/central/v1/organizations/1", req.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
 		encoder := json.NewEncoder(w)
 		encoder.Encode(org)
 	}))
@@ -111,6 +112,7 @@ func TestClient_GetOrganizations(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		assert.Equal(t, "/api/central/v1/organizations", req.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
 		encoder := json.NewEncoder(w)
 		encoder.Encode(orgs)
 	}))

@@ -4,27 +4,15 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/t11e/go-pebbleclient"
+	pc "github.com/t11e/go-pebbleclient"
 )
 
 type Client struct {
-	client *pebbleclient.Client
+	c pc.Client
 }
 
 // New constructs a new client.
-func New(client *pebbleclient.Client) (*Client, error) {
-	return &Client{client}, nil
-}
-
-// NewFromRequest constructs a new client from an HTTP request.
-func NewFromRequest(options pebbleclient.ClientOptions, req *http.Request) (*Client, error) {
-	if options.AppName == "" {
-		options.AppName = "central"
-	}
-	client, err := pebbleclient.NewFromRequest(options, req)
-	if err != nil {
-		return nil, err
-	}
+func New(client pc.Client) (*Client, error) {
 	return &Client{client}, nil
 }
 
@@ -38,8 +26,8 @@ func (client *Client) IsValidApplicationKey(key string) (bool, error) {
 // GetApplicationByKey returns an application by its key.
 func (client *Client) GetApplicationByKey(key string) (*Application, error) {
 	var app Application
-	if err := client.client.Get(fmt.Sprintf("/applications/keys/%s", key), &app); err != nil {
-		if err == pebbleclient.NotFound {
+	if err := client.c.Get(fmt.Sprintf("/applications/keys/%s", pc.URIEscape(key)), nil, &app); err != nil {
+		if httpErr, ok := err.(*pc.RequestError); ok && httpErr.Resp.StatusCode == http.StatusNotFound {
 			return nil, nil
 		}
 		return nil, err
@@ -50,7 +38,7 @@ func (client *Client) GetApplicationByKey(key string) (*Application, error) {
 // GetOrganizations returns all organizations.
 func (client *Client) GetOrganizations() ([]*Organization, error) {
 	var organizations []*Organization
-	if err := client.client.Get("/organizations", &organizations); err != nil {
+	if err := client.c.Get("/organizations", nil, &organizations); err != nil {
 		return nil, err
 	}
 	return organizations, nil
@@ -59,8 +47,8 @@ func (client *Client) GetOrganizations() ([]*Organization, error) {
 // GetOrganization returns an organization by its ID.
 func (client *Client) GetOrganization(id int) (*Organization, error) {
 	var organization Organization
-	if err := client.client.Get(fmt.Sprintf("/organizations/%d", id), &organization); err != nil {
-		if err == pebbleclient.NotFound {
+	if err := client.c.Get(fmt.Sprintf("/organizations/%d", id), nil, &organization); err != nil {
+		if httpErr, ok := err.(*pc.RequestError); ok && httpErr.Resp.StatusCode == http.StatusNotFound {
 			return nil, nil
 		}
 		return nil, err
@@ -71,8 +59,8 @@ func (client *Client) GetOrganization(id int) (*Organization, error) {
 // GetChildOrganizations returns all child organizations of another organization.
 func (client *Client) GetChildOrganizations(organization *Organization) ([]*Organization, error) {
 	var organizations []*Organization
-	if err := client.client.Get(
-		fmt.Sprintf("/organizations/%d/organizations", organization.Id), &organizations); err != nil {
+	if err := client.c.Get(fmt.Sprintf("/organizations/%d/organizations", organization.Id),
+		nil, &organizations); err != nil {
 		return nil, err
 	}
 	return organizations, nil
