@@ -25,7 +25,11 @@ func (client *Client) IsValidApplicationKey(key string) (bool, error) {
 // GetApplicationByKey returns an application by its key.
 func (client *Client) GetApplicationByKey(key string) (*Application, error) {
 	var app Application
-	if err := client.c.Get(pc.FormatPath("/applications/keys/:key", pc.Params{"key": key}), nil, &app); err != nil {
+	if err := client.c.Get("/applications/keys/:key", &pc.RequestOptions{
+		Params: pc.Params{
+			"key": key,
+		},
+	}, &app); err != nil {
 		if httpErr, ok := err.(*pc.RequestError); ok && httpErr.Resp.StatusCode == http.StatusNotFound {
 			return nil, nil
 		}
@@ -46,7 +50,11 @@ func (client *Client) GetOrganizations() ([]*Organization, error) {
 // GetOrganization returns an organization by its ID.
 func (client *Client) GetOrganization(id int) (*Organization, error) {
 	var organization Organization
-	if err := client.c.Get(pc.FormatPath("/organizations/:id", pc.Params{"id": id}), nil, &organization); err != nil {
+	if err := client.c.Get("/organizations/:id", &pc.RequestOptions{
+		Params: pc.Params{
+			"id": id,
+		},
+	}, &organization); err != nil {
 		if httpErr, ok := err.(*pc.RequestError); ok && httpErr.Resp.StatusCode == http.StatusNotFound {
 			return nil, nil
 		}
@@ -58,8 +66,11 @@ func (client *Client) GetOrganization(id int) (*Organization, error) {
 // GetChildOrganizations returns all child organizations of another organization.
 func (client *Client) GetChildOrganizations(organization *Organization) ([]*Organization, error) {
 	var organizations []*Organization
-	if err := client.c.Get(pc.FormatPath("/organizations/:id/organizations", pc.Params{"id": organization.Id}),
-		nil, &organizations); err != nil {
+	if err := client.c.Get("/organizations/:id/organizations", &pc.RequestOptions{
+		Params: pc.Params{
+			"id": organization.Id,
+		},
+	}, &organizations); err != nil {
 		return nil, err
 	}
 	return organizations, nil

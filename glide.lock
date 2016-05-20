@@ -1,5 +1,5 @@
 hash: 4e9672b36e464659069e80f3189138bde8e9565a7988a7479cc60295bab36542
-updated: 2016-05-20T13:56:45.502504842-04:00
+updated: 2016-05-20T14:22:16.897925347-04:00
 imports:
 - name: github.com/ernesto-jimenez/httplogger
   version: 86cc44f6150a7e9dca8586e425a9c73e71f8ae7d
@@ -8,7 +8,7 @@ imports:
 - name: github.com/stretchr/testify
   version: f390dcf405f7b83c997eac1b06768bb9f44dec18
 - name: github.com/t11e/go-pebbleclient
-  version: 7e20e235c9d9d6cc62f9949df1eb8d50130528ef
+  version: c2ebe0efdd59c1f97be0a88888b55dbba6d71352
 - name: golang.org/x/net
   version: 8a52c78636f6b7be1b1e5cb58b01a85f1e082659
   subpackages:
