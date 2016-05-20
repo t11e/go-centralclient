@@ -10,7 +10,7 @@ import (
 	pc "github.com/t11e/go-pebbleclient"
 )
 
-func newTestClient(host string) (*Client, error) {
+func newTestClient(host string) (Client, error) {
 	c, err := pc.NewHTTPClient(pc.Options{
 		Host:        host,
 		ServiceName: "central",

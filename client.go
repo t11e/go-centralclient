@@ -23,13 +23,21 @@ func (err *NoSuchOrganization) Error() string {
 	return fmt.Sprintf("No such organization: %q", err.Id)
 }
 
-type Client struct {
+type Client interface {
+	IsValidApplicationKey(key string) (bool, error)
+	GetApplicationByKey(key string) (*Application, error)
+	GetOrganization(id int) (*Organization, error)
+	GetOrganizations() ([]*Organization, error)
+	GetChildOrganizations(organization *Organization) ([]*Organization, error)
+}
+
+type client struct {
 	c pc.Client
 }
 
 // New constructs a new client.
-func New(client pc.Client) (*Client, error) {
-	return &Client{client.Options(pc.Options{
+func New(pebbleClient pc.Client) (Client, error) {
+	return &client{pebbleClient.Options(pc.Options{
 		ServiceName: "central",
 		ApiVersion:  1,
 	})}, nil
@@ -37,15 +45,15 @@ func New(client pc.Client) (*Client, error) {
 
 // IsValidApplicationKey is a convenience method to check if a key is a valid
 // application key. Returns true if so.
-func (client *Client) IsValidApplicationKey(key string) (bool, error) {
-	app, err := client.GetApplicationByKey(key)
+func (c *client) IsValidApplicationKey(key string) (bool, error) {
+	app, err := c.GetApplicationByKey(key)
 	return app != nil, err
 }
 
 // GetApplicationByKey returns an application by its key.
-func (client *Client) GetApplicationByKey(key string) (*Application, error) {
+func (c *client) GetApplicationByKey(key string) (*Application, error) {
 	var app Application
-	if err := client.c.Get("/applications/keys/:key", &pc.RequestOptions{
+	if err := c.c.Get("/applications/keys/:key", &pc.RequestOptions{
 		Params: pc.Params{
 			"key": key,
 		},
@@ -59,9 +67,9 @@ func (client *Client) GetApplicationByKey(key string) (*Application, error) {
 }
 
 // GetOrganizations returns all organizations.
-func (client *Client) GetOrganizations() ([]*Organization, error) {
+func (c *client) GetOrganizations() ([]*Organization, error) {
 	var organizations []*Organization
-	if err := client.c.Get("/organizations", nil, &organizations); err != nil {
+	if err := c.c.Get("/organizations", nil, &organizations); err != nil {
 		return nil, err
 	}
 	return organizations, nil
@@ -69,9 +77,9 @@ func (client *Client) GetOrganizations() ([]*Organization, error) {
 
 // GetOrganization returns an organization by its ID. If organization does
 // not exist, returns NoSuchOrganization.
-func (client *Client) GetOrganization(id int) (*Organization, error) {
+func (c *client) GetOrganization(id int) (*Organization, error) {
 	var organization Organization
-	if err := client.c.Get("/organizations/:id", &pc.RequestOptions{
+	if err := c.c.Get("/organizations/:id", &pc.RequestOptions{
 		Params: pc.Params{
 			"id": id,
 		},
@@ -86,9 +94,9 @@ func (client *Client) GetOrganization(id int) (*Organization, error) {
 
 // GetChildOrganizations returns all child organizations of another organization.
 // If the organization does not exist, returns a NoSuchOrganization error.
-func (client *Client) GetChildOrganizations(organization *Organization) ([]*Organization, error) {
+func (c *client) GetChildOrganizations(organization *Organization) ([]*Organization, error) {
 	var organizations []*Organization
-	if err := client.c.Get("/organizations/:id/organizations", &pc.RequestOptions{
+	if err := c.c.Get("/organizations/:id/organizations", &pc.RequestOptions{
 		Params: pc.Params{
 			"id": organization.Id,
 		},
