@@ -1,7 +1,6 @@
 package centralclient
 
 import (
-	"fmt"
 	"net/http"
 
 	pc "github.com/t11e/go-pebbleclient"
@@ -26,7 +25,7 @@ func (client *Client) IsValidApplicationKey(key string) (bool, error) {
 // GetApplicationByKey returns an application by its key.
 func (client *Client) GetApplicationByKey(key string) (*Application, error) {
 	var app Application
-	if err := client.c.Get(fmt.Sprintf("/applications/keys/%s", pc.URIEscape(key)), nil, &app); err != nil {
+	if err := client.c.Get(pc.FormatPath("/applications/keys/:key", pc.Params{"key": key}), nil, &app); err != nil {
 		if httpErr, ok := err.(*pc.RequestError); ok && httpErr.Resp.StatusCode == http.StatusNotFound {
 			return nil, nil
 		}
@@ -47,7 +46,7 @@ func (client *Client) GetOrganizations() ([]*Organization, error) {
 // GetOrganization returns an organization by its ID.
 func (client *Client) GetOrganization(id int) (*Organization, error) {
 	var organization Organization
-	if err := client.c.Get(fmt.Sprintf("/organizations/%d", id), nil, &organization); err != nil {
+	if err := client.c.Get(pc.FormatPath("/organizations/:id", pc.Params{"id": id}), nil, &organization); err != nil {
 		if httpErr, ok := err.(*pc.RequestError); ok && httpErr.Resp.StatusCode == http.StatusNotFound {
 			return nil, nil
 		}
@@ -59,7 +58,7 @@ func (client *Client) GetOrganization(id int) (*Organization, error) {
 // GetChildOrganizations returns all child organizations of another organization.
 func (client *Client) GetChildOrganizations(organization *Organization) ([]*Organization, error) {
 	var organizations []*Organization
-	if err := client.c.Get(fmt.Sprintf("/organizations/%d/organizations", organization.Id),
+	if err := client.c.Get(pc.FormatPath("/organizations/:id/organizations", pc.Params{"id": organization.Id}),
 		nil, &organizations); err != nil {
 		return nil, err
 	}
