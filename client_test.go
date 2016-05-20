@@ -56,9 +56,14 @@ func TestClient_GetApplicationByKey_notFound(t *testing.T) {
 	client, err := newTestClient(hostFromUrl(server.URL))
 	assert.NoError(t, err)
 
-	org, err := client.GetApplicationByKey("frobnitz")
-	assert.NoError(t, err)
-	assert.Nil(t, org)
+	_, err = client.GetApplicationByKey("frobnitz")
+	assert.Error(t, err)
+
+	badKeyErr, ok := err.(*BadAPIKey)
+	if !assert.True(t, ok) {
+		return
+	}
+	assert.Equal(t, "frobnitz", badKeyErr.Key)
 }
 
 func TestClient_GetOrganization_found(t *testing.T) {
@@ -91,9 +96,13 @@ func TestClient_GetOrganization_notFound(t *testing.T) {
 	client, err := newTestClient(hostFromUrl(server.URL))
 	assert.NoError(t, err)
 
-	org, err := client.GetOrganization(1)
-	assert.NoError(t, err)
-	assert.Nil(t, org)
+	_, err = client.GetOrganization(1)
+	assert.Error(t, err)
+	notFound, ok := err.(*NoSuchOrganization)
+	if !assert.True(t, ok) {
+		return
+	}
+	assert.Equal(t, 1, notFound.Id)
 }
 
 func TestClient_GetOrganizations(t *testing.T) {

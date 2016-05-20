@@ -1,10 +1,27 @@
 package centralclient
 
 import (
+	"fmt"
 	"net/http"
 
 	pc "github.com/t11e/go-pebbleclient"
 )
+
+type BadAPIKey struct {
+	Key string
+}
+
+func (err *BadAPIKey) Error() string {
+	return fmt.Sprintf("Not a valid application key: %q", err.Key)
+}
+
+type NoSuchOrganization struct {
+	Id int
+}
+
+func (err *NoSuchOrganization) Error() string {
+	return fmt.Sprintf("No such organization: %q", err.Id)
+}
 
 type Client struct {
 	c pc.Client
@@ -31,7 +48,7 @@ func (client *Client) GetApplicationByKey(key string) (*Application, error) {
 		},
 	}, &app); err != nil {
 		if httpErr, ok := err.(*pc.RequestError); ok && httpErr.Resp.StatusCode == http.StatusNotFound {
-			return nil, nil
+			return nil, &BadAPIKey{key}
 		}
 		return nil, err
 	}
@@ -47,7 +64,8 @@ func (client *Client) GetOrganizations() ([]*Organization, error) {
 	return organizations, nil
 }
 
-// GetOrganization returns an organization by its ID.
+// GetOrganization returns an organization by its ID. If organization does
+// not exist, returns NoSuchOrganization.
 func (client *Client) GetOrganization(id int) (*Organization, error) {
 	var organization Organization
 	if err := client.c.Get("/organizations/:id", &pc.RequestOptions{
@@ -56,7 +74,7 @@ func (client *Client) GetOrganization(id int) (*Organization, error) {
 		},
 	}, &organization); err != nil {
 		if httpErr, ok := err.(*pc.RequestError); ok && httpErr.Resp.StatusCode == http.StatusNotFound {
-			return nil, nil
+			return nil, &NoSuchOrganization{id}
 		}
 		return nil, err
 	}
@@ -64,6 +82,7 @@ func (client *Client) GetOrganization(id int) (*Organization, error) {
 }
 
 // GetChildOrganizations returns all child organizations of another organization.
+// If the organization does not exist, returns a NoSuchOrganization error.
 func (client *Client) GetChildOrganizations(organization *Organization) ([]*Organization, error) {
 	var organizations []*Organization
 	if err := client.c.Get("/organizations/:id/organizations", &pc.RequestOptions{
@@ -71,6 +90,9 @@ func (client *Client) GetChildOrganizations(organization *Organization) ([]*Orga
 			"id": organization.Id,
 		},
 	}, &organizations); err != nil {
+		if httpErr, ok := err.(*pc.RequestError); ok && httpErr.Resp.StatusCode == http.StatusNotFound {
+			return nil, &NoSuchOrganization{organization.Id}
+		}
 		return nil, err
 	}
 	return organizations, nil
