@@ -7,6 +7,8 @@ import (
 	pc "github.com/t11e/go-pebbleclient"
 )
 
+//go:generate go run vendor/github.com/vektra/mockery/cmd/mockery/mockery.go -name=Client -case=underscore
+
 type BadAPIKey struct {
 	Key string
 }
